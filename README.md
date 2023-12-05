@@ -13,6 +13,6 @@
   * 300x180 pixel
   * 8bpc RGBA formatuan esportatu
 * Konpilazioa:
-  * zig build -Dinstaller-data=/jokoaren/instalazio/bidea -Doptimize=ReleaseSmall 
-  * zig build -Dinstaller-data=/jokoaren/instalazio/bidea -Dtarget=x86_64-macos -Doptimize=ReleaseSmall 
-  * zig build -Dinstaller-data=/jokoaren/instalazio/bidea -Dtarget=x86_64-windows -Doptimize=ReleaseSmall 
+  * zig build -Dinstaller-data=/itzulpen/instalatzaile/data -Doptimize=ReleaseSmall 
+  * zig build -Dinstaller-data=/itzulpen/instalatzaile/data -Dtarget=x86_64-macos -Doptimize=ReleaseSmall 
+  * zig build -Dinstaller-data=/itzulpen/instalatzaile/data -Dtarget=x86_64-windows -Doptimize=ReleaseSmall 
