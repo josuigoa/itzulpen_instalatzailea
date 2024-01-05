@@ -36,13 +36,45 @@ pub fn look_for_dir(base_path: string, dir_name: string) !string {
         switch (entry.?.kind) {
             .directory => {
                 if (std.mem.eql(u8, entry.?.name, dir_name)) {
-                    const look_for = try concat(&.{ base_path, "/", dir_name });
-                    return look_for;
+                    return try concat(&.{ base_path, "/", dir_name });
                 } else {
                     const val = try look_for_dir(try concat(&.{ base_path, "/", entry.?.name }), dir_name);
                     if (val.len != 0) {
                         return val;
                     }
+                }
+            },
+            else => {},
+        }
+    }
+
+    return "";
+}
+
+pub fn look_for_file(base_path: string, file_name: string) !string {
+    const base_dir = try std.fs.openDirAbsolute(base_path, std.fs.Dir.OpenDirOptions{
+        .access_sub_paths = true,
+        .iterate = true,
+        .no_follow = true,
+    });
+
+    var iter = base_dir.iterate();
+    while (true) {
+        const entry = try iter.next();
+        if (entry == null) {
+            break;
+        }
+
+        switch (entry.?.kind) {
+            .file => {
+                if (std.mem.eql(u8, entry.?.name, file_name)) {
+                    return try concat(&.{ base_path, "/", file_name });
+                }
+            },
+            .directory => {
+                const val = try look_for_file(try concat(&.{ base_path, "/", entry.?.name }), file_name);
+                if (val.len != 0) {
+                    return val;
                 }
             },
             else => {},
