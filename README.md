@@ -14,6 +14,6 @@
   * 8bpc RGBA formatuan esportatu
 * Konpilazioa:
   * zig build -Dinstaller-data=/jokoaren/instalatzaile/bidea -Doptimize=ReleaseSmall 
-  * zig build -Dinstaller-data=/jokoaren/instalatzaile/bidea -Dtarget=x86_64-macos -Doptimize=ReleaseSmall 
   * zig build -Dinstaller-data=/jokoaren/instalatzaile/bidea -Dtarget=aarch64-macos -Doptimize=ReleaseSmall 
+  * zig build -Dinstaller-data=/jokoaren/instalatzaile/bidea -Dtarget=x86_64-macos -Doptimize=ReleaseSmall 
   * zig build -Dinstaller-data=/jokoaren/instalatzaile/bidea -Dtarget=x86_64-windows -Doptimize=ReleaseSmall 

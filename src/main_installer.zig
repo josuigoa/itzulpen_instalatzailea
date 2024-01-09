@@ -5,7 +5,7 @@ const utils = @import("utils");
 const builtin = @import("builtin");
 const installation_finder = @import("installation_finder.zig");
 const data = @import("data/installer.zig");
-const header_png = @embedFile("data/header.png");
+// const header_png = @embedFile("data/header.png");
 
 pub const App = struct {
     window: *ui.Window,
@@ -26,8 +26,12 @@ pub fn main() !void {
     };
     defer ui.Uninit();
 
-    const window_width = if (builtin.os.tag == .linux) 550 else 400;
-    const window_height = if (builtin.os.tag == .linux) 330 else 160;
+    // irudia agertzea lortzean hau erabili
+    // const window_width = if (builtin.os.tag == .linux) 550 else 400;
+    // const window_height = if (builtin.os.tag == .linux) 330 else 160;
+
+    const window_width = 400;
+    const window_height = 160;
 
     const main_window = try ui.Window.New("Itzulpen instalatzailea", window_width, window_height, .hide_menubar);
     main_window.SetMargined(true);
@@ -39,23 +43,23 @@ pub fn main() !void {
     main_window.SetChild(v_box.as_control());
 
     if (builtin.os.tag == .linux) {
-        var model_handler = ui.Table.Model.Handler{
-            .NumColumns = num_cols,
-            .NumRows = num_rows,
-            .ColumnType = col_type,
-            .CellValue = cell_value,
-            .SetCellValue = set_cell_value,
-        };
-        var table_params = ui.Table.Params{
-            .Model = try ui.Table.Model.New(&model_handler),
-            .RowBackgroundColorModelColumn = -1,
-        };
-        const table = try ui.Table.New(&table_params);
-        table.AppendColumn("", .{ .Image = .{
-            .image_column = 1,
-        } });
-        table.HeaderSetVisible(false);
-        v_box.Append(table.as_control(), .stretch);
+        // var model_handler = ui.Table.Model.Handler{
+        //     .NumColumns = num_cols,
+        //     .NumRows = num_rows,
+        //     .ColumnType = col_type,
+        //     .CellValue = cell_value,
+        //     .SetCellValue = set_cell_value,
+        // };
+        // var table_params = ui.Table.Params{
+        //     .Model = try ui.Table.Model.New(&model_handler),
+        //     .RowBackgroundColorModelColumn = -1,
+        // };
+        // const table = try ui.Table.New(&table_params);
+        // table.AppendColumn("", .{ .Image = .{
+        //     .image_column = 1,
+        // } });
+        // table.HeaderSetVisible(false);
+        // v_box.Append(table.as_control(), .stretch);
     }
 
     const joko_izena = data.get_game_names()[0];
@@ -97,34 +101,34 @@ pub fn main() !void {
     ui.Main();
 }
 
-fn num_cols(_: *ui.Table.Model.Handler, _: *ui.Table.Model) callconv(.C) c_int {
-    return 1;
-}
-fn num_rows(_: *ui.Table.Model.Handler, _: *ui.Table.Model) callconv(.C) c_int {
-    return 1;
-}
-fn col_type(_: *ui.Table.Model.Handler, _: *ui.Table.Model, _: c_int) callconv(.C) ui.Table.Value.Type {
-    return .Image;
-}
-fn cell_value(_: *ui.Table.Model.Handler, _: *ui.Table.Model, _: c_int, _: c_int) callconv(.C) ?*ui.Table.Value {
-    var stream_source = std.io.StreamSource{ .const_buffer = std.io.fixedBufferStream(header_png) };
-    const png = zigimg.png.PNG.readImage(std.heap.page_allocator, &stream_source) catch return null;
+// fn num_cols(_: *ui.Table.Model.Handler, _: *ui.Table.Model) callconv(.C) c_int {
+//     return 1;
+// }
+// fn num_rows(_: *ui.Table.Model.Handler, _: *ui.Table.Model) callconv(.C) c_int {
+//     return 1;
+// }
+// fn col_type(_: *ui.Table.Model.Handler, _: *ui.Table.Model, _: c_int) callconv(.C) ui.Table.Value.Type {
+//     return .Image;
+// }
+// fn cell_value(_: *ui.Table.Model.Handler, _: *ui.Table.Model, _: c_int, _: c_int) callconv(.C) ?*ui.Table.Value {
+//     var stream_source = std.io.StreamSource{ .const_buffer = std.io.fixedBufferStream(header_png) };
+//     const png = zigimg.png.PNG.readImage(std.heap.page_allocator, &stream_source) catch return null;
 
-    const width = 300;
-    const height = 180;
+//     const width = 300;
+//     const height = 180;
 
-    if (ui.Image.New(width, height)) |img| {
-        img.Append(@ptrCast(@constCast(png.rawBytes()[0..])), width, height, width * 4);
-        if (ui.Table.Value.New(.{ .Image = img })) |value| {
-            return value;
-        } else |_| {
-            return null;
-        }
-    } else |_| {
-        return null;
-    }
-}
-fn set_cell_value(_: *ui.Table.Model.Handler, _: *ui.Table.Model, _: c_int, _: c_int, _: ?*const ui.Table.Value) callconv(.C) void {}
+//     if (ui.Image.New(width, height)) |img| {
+//         img.Append(@ptrCast(@constCast(png.rawBytes()[0..])), width, height, width * 4);
+//         if (ui.Table.Value.New(.{ .Image = img })) |value| {
+//             return value;
+//         } else |_| {
+//             return null;
+//         }
+//     } else |_| {
+//         return null;
+//     }
+// }
+// fn set_cell_value(_: *ui.Table.Model.Handler, _: *ui.Table.Model, _: c_int, _: c_int, _: ?*const ui.Table.Value) callconv(.C) void {}
 
 pub fn on_closing(_: *ui.Window, _: ?*void) ui.Window.ClosingAction {
     ui.Quit();
