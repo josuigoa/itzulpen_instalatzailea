@@ -44,22 +44,25 @@ fn find_steam_game() !string {
             path = try utils.apply_separator(try utils.concat(&.{ possible_path, "/", game_name }));
             if (std.fs.accessAbsolute(path, std.fs.File.OpenFlags{})) {
                 return path;
-            } else |_| {
+            } else |err| {
+                if (err == Dir.AccessError.FileNotFound) {
+                    std.debug.print("[{s}] ez da aurkitu: {?}\n", .{ path, err });
+                }
                 if (read_libraryfolders(path)) |library_paths| {
                     for (library_paths) |lib_path| {
                         path = try utils.apply_separator(try utils.concat(&.{ lib_path, "/", game_name }));
                         if (std.fs.accessAbsolute(path, std.fs.File.OpenFlags{})) {
                             return path;
-                        } else |err| {
-                            if (err == Dir.AccessError.FileNotFound) {
-                                std.debug.print("{s} ez da aurkitu: {?}\n", .{ path, err });
+                        } else |errlibpath| {
+                            if (errlibpath == Dir.AccessError.FileNotFound) {
+                                std.debug.print("[{s}] ez da aurkitu: {?}\n", .{ path, err });
                             }
                             std.heap.page_allocator.free(path);
                         }
                     }
-                } else |err| {
-                    if (err == Dir.AccessError.FileNotFound) {
-                        std.debug.print("{s} ez da aurkitu: {?}\n", .{ path, err });
+                } else |errlibfold| {
+                    if (errlibfold == Dir.AccessError.FileNotFound) {
+                        std.debug.print("[libraryfolders.vdf] ez da aurkitu: {?}\n", .{err});
                     }
                     std.heap.page_allocator.free(path);
                 }
@@ -124,7 +127,7 @@ fn find_gog_game() !string {
             path = try utils.apply_separator(try utils.concat(&.{ possible_path, "/", game_name }));
             std.fs.accessAbsolute(path, std.fs.File.OpenFlags{}) catch |err| {
                 if (err == Dir.AccessError.FileNotFound) {
-                    std.debug.print("{s} ez da aurkitu: {?}\n", .{ path, err });
+                    std.debug.print("[{s}] ez da aurkitu: {?}\n", .{ path, err });
                     std.heap.page_allocator.free(path);
                     continue;
                 }
@@ -137,18 +140,20 @@ fn find_gog_game() !string {
     return Dir.AccessError.FileNotFound;
 }
 
-fn get_steam_paths() ![10]string {
-    var paths: [10]string = undefined;
+fn get_steam_paths() ![5]string {
+    var paths: [5]string = .{""} ** 5;
+
     if (builtin.os.tag == .windows) {
-        const program_files = try std.process.getEnvVarOwned(std.heap.page_allocator, "%PROGRAMFILES%");
+        const program_files = try std.process.getEnvVarOwned(std.heap.page_allocator, "ProgramFiles");
         paths[0] = try utils.concat(&.{ program_files, "\\Steam\\steamapps\\common" });
 
-        const program_files_x86 = try std.process.getEnvVarOwned(std.heap.page_allocator, "%PROGRAMFILES(X86)%");
+        const program_files_x86 = try std.process.getEnvVarOwned(std.heap.page_allocator, "ProgramFiles(x86)");
         paths[1] = try utils.concat(&.{ program_files_x86, "\\Steam\\steamapps\\common" });
-        paths[2] = "z:\\home\\deck\\.steam\\steam\\steamapps\\common";
 
-        const username = try std.process.getEnvVarOwned(std.heap.page_allocator, "%USERNAME%");
-        paths[3] = try utils.concat(&.{ "z:\\home\\", username, "\\.steam\\steam\\steamapps\\common" });
+        const username = try std.process.getEnvVarOwned(std.heap.page_allocator, "USERNAME");
+        paths[2] = try utils.concat(&.{ "z:\\home\\", username, "\\.steam\\steam\\steamapps\\common" });
+
+        paths[3] = "z:\\home\\deck\\.steam\\steam\\steamapps\\common";
     } else if (builtin.os.tag == .linux) {
         const home_dir = try std.process.getEnvVarOwned(std.heap.page_allocator, "HOME");
         paths[0] = try utils.concat(&.{ home_dir, "/.steam/steam/steamapps/common" });
@@ -160,11 +165,11 @@ fn get_steam_paths() ![10]string {
     return paths;
 }
 
-fn get_gog_paths() ![10]string {
-    var paths: [10]string = undefined;
+fn get_gog_paths() ![5]string {
+    var paths: [5]string = .{""} ** 5;
     if (builtin.os.tag == .windows) {
-        const program_files = try std.process.getEnvVarOwned(std.heap.page_allocator, "%PROGRAMFILES%");
-        const program_files_x86 = try std.process.getEnvVarOwned(std.heap.page_allocator, "%PROGRAMFILES(X86)%");
+        const program_files = try std.process.getEnvVarOwned(std.heap.page_allocator, "ProgramFiles");
+        const program_files_x86 = try std.process.getEnvVarOwned(std.heap.page_allocator, "ProgramFiles(x86)");
         paths[0] = try utils.concat(&.{ program_files, "/GOG Games" });
         paths[1] = try utils.concat(&.{ program_files, "/GOG Galaxy/Games" });
         paths[2] = try utils.concat(&.{ program_files_x86, "/GOG Games" });
