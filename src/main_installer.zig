@@ -159,8 +159,13 @@ fn get_folder(_: *ui.Button, app_opt: ?*App) void {
 fn install_translation(_: *ui.Button, app_opt: ?*App) void {
     const app = app_opt orelse @panic("Null userdata pointer");
     std.debug.print("Installing in [{s}]\n", .{app.install_path_entry.Text()});
-    if (data.install_translation(std.mem.span(app.install_path_entry.Text()))) {
-        app.window.MsgBox("Zorionak", "Itzulpenaren instalazioa ongi burutu da.\nEskerrik asko");
+
+    if (data.install_translation(std.mem.span(app.install_path_entry.Text()))) |opt_installer_response| {
+        if (opt_installer_response) |installer_response| {
+            app.window.MsgBox(installer_response.title, installer_response.body);
+        } else {
+            app.window.MsgBox("Zorionak", "Itzulpenaren instalazioa ongi burutu da.\nEskerrik asko");
+        }
     } else |err| {
         app.window.MsgBoxError("Instalatzerakoan errorea", "Erroreren bat egon da itzulpena instalatzerakoan. Exekutatu instalatzailea komando lerroan eta ikusi zein errore izan den.");
         std.debug.print("Instalatzerakoan errorea: {}\n", .{err});

@@ -7,7 +7,7 @@
   * `data` izeneko karpeta batean bidea izan behar du. Karpeta honen barrenean:
     * Itzulpenaren instalzazioa eginen duen `installer.zig` fitxategia. Funtzio hauek derrigorrezkoak.
       * pub fn get_game_names() [5]utils.string;
-      * pub fn install_translation(game_path: utils.string) !void;
+      * pub fn install_translation(game_path: utils.string) !?utils.InstallerResponse;
     * Instalazioan agertuko den goirburuko `header.png` izeneko irudia
 * `header.png` fitxategia sortzerakoan:
   * 300x180 pixel

@@ -2,6 +2,11 @@ const std = @import("std");
 const builtin = @import("builtin");
 
 pub const string = []const u8;
+pub const nt_string = [:0]const u8;
+pub const InstallerResponse = struct {
+    title: nt_string,
+    body: nt_string,
+};
 
 pub fn concat(slices: []const string) !string {
     return try std.mem.concat(

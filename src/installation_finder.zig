@@ -101,9 +101,9 @@ fn read_libraryfolders(base_path: string) ![10]string {
                 }
             }
 
-            const lenght = line.len - path_start_ind - 2;
+            const length = line.len - path_start_ind - 2;
 
-            if (std.heap.page_allocator.alloc(u8, lenght)) |new_str| {
+            if (std.heap.page_allocator.alloc(u8, length)) |new_str| {
                 @memcpy(new_str, line[path_start_ind + 1 .. line.len - 1]);
                 paths[paths_ind] = new_str;
                 paths_ind += 1;
