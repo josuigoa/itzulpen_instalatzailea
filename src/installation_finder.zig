@@ -157,6 +157,9 @@ fn get_steam_paths() ![5]string {
     } else if (builtin.os.tag == .linux) {
         const home_dir = try std.process.getEnvVarOwned(std.heap.page_allocator, "HOME");
         paths[0] = try utils.concat(&.{ home_dir, "/.steam/steam/steamapps/common" });
+        // libraryfolders.vdf bilatzeko
+        paths[1] = try utils.concat(&.{ home_dir, "/.steam/steam/config" });
+        paths[2] = try utils.concat(&.{ home_dir, "/.var/app/com.valvesoftware.Steam/.local/share/Steam/config" });
     } else {
         const home_dir = try std.process.getEnvVarOwned(std.heap.page_allocator, "HOME");
         paths[0] = try utils.concat(&.{ home_dir, "/Library/Application Support/Steam/steamapps/common" });
