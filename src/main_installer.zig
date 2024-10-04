@@ -5,7 +5,6 @@ const utils = @import("utils");
 const builtin = @import("builtin");
 const installation_finder = @import("installation_finder.zig");
 const data = @import("data/installer.zig");
-// const header_png = @embedFile("data/header.png");
 
 pub const App = struct {
     window: *ui.Window,
@@ -16,6 +15,8 @@ pub const App = struct {
 };
 
 pub fn main() !void {
+    comptime data.comptime_checks();
+
     const game_path = installation_finder.find_installation() orelse "";
 
     var init_data = ui.InitData{
