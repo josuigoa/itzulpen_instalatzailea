@@ -48,7 +48,7 @@ fn find_steam_game() !string {
                 if (err == Dir.AccessError.FileNotFound) {
                     std.debug.print("[{s}] ez da aurkitu: {?}\n", .{ path, err });
                 }
-                if (read_libraryfolders(path)) |library_paths| {
+                if (read_libraryfolders(possible_path)) |library_paths| {
                     for (library_paths) |lib_path| {
                         path = try utils.apply_separator(try utils.concat(&.{ lib_path, "/", game_name }));
                         if (std.fs.accessAbsolute(path, std.fs.File.OpenFlags{})) {
@@ -62,7 +62,7 @@ fn find_steam_game() !string {
                     }
                 } else |errlibfold| {
                     if (errlibfold == Dir.AccessError.FileNotFound) {
-                        std.debug.print("[libraryfolders.vdf] ez da aurkitu: {?}\n", .{err});
+                        std.debug.print("[{s}/libraryfolders.vdf] ezin izan da aurkitu: {?}\n", .{ possible_path, err });
                     }
                     std.heap.page_allocator.free(path);
                 }
@@ -140,8 +140,8 @@ fn find_gog_game() !string {
     return Dir.AccessError.FileNotFound;
 }
 
-fn get_steam_paths() ![5]string {
-    var paths: [5]string = .{""} ** 5;
+fn get_steam_paths() ![10]string {
+    var paths: [10]string = .{""} ** 10;
 
     if (builtin.os.tag == .windows) {
         const program_files = try std.process.getEnvVarOwned(std.heap.page_allocator, "ProgramFiles");
@@ -152,21 +152,27 @@ fn get_steam_paths() ![5]string {
 
         const username = try std.process.getEnvVarOwned(std.heap.page_allocator, "USERNAME");
         paths[2] = try utils.concat(&.{ "z:\\home\\", username, "\\.steam\\steam\\steamapps\\common" });
+        paths[3] = try utils.concat(&.{ "z:\\home\\", username, "\\.steam\\steam\\steamapps" });
 
-        paths[3] = "z:\\home\\deck\\.steam\\steam\\steamapps\\common";
+        paths[4] = "z:\\home\\deck\\.steam\\steam\\steamapps\\common";
+        paths[5] = "z:\\home\\deck\\.steam\\steam\\steamapps";
     } else if (builtin.os.tag == .linux) {
         const home_dir = try std.process.getEnvVarOwned(std.heap.page_allocator, "HOME");
         paths[0] = try utils.concat(&.{ home_dir, "/.steam/steam/steamapps/common" });
         // libraryfolders.vdf bilatzeko
         paths[1] = try utils.concat(&.{ home_dir, "/.steam/steam/config" });
+        paths[2] = try utils.concat(&.{ home_dir, "/.steam/steam/steamapps" });
 
         // flatpak instalazioarekin
-        paths[2] = try utils.concat(&.{ home_dir, "/.var/app/com.valvesoftware.Steam/data/Steam/steamapps/common" });
+        paths[3] = try utils.concat(&.{ home_dir, "/.var/app/com.valvesoftware.Steam/data/Steam/steamapps/common" });
         // libraryfolders.vdf bilatzeko
-        paths[3] = try utils.concat(&.{ home_dir, "/.var/app/com.valvesoftware.Steam/.local/share/Steam/config" });
+        paths[4] = try utils.concat(&.{ home_dir, "/.var/app/com.valvesoftware.Steam/.local/share/Steam/config" });
+        paths[5] = try utils.concat(&.{ home_dir, "/.var/app/com.valvesoftware.Steam/data/Steam/steamapps" });
     } else {
         const home_dir = try std.process.getEnvVarOwned(std.heap.page_allocator, "HOME");
         paths[0] = try utils.concat(&.{ home_dir, "/Library/Application Support/Steam/steamapps/common" });
+        // libraryfolders.vdf bilatzeko
+        paths[1] = try utils.concat(&.{ home_dir, "/Library/Application Support/Steam/steamapps" });
     }
 
     return paths;
