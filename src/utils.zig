@@ -88,3 +88,22 @@ pub fn look_for_file(base_path: string, file_name: string) !string {
 
     return "";
 }
+
+pub fn backup_file(dir_path: string, file_name: string) !bool {
+    const backup_file_pre_name = try concat(&.{ file_name, "_backup_" });
+
+    var dir = try std.fs.cwd().openDir(dir_path, .{.iterate = true});
+    defer dir.close();
+
+    var dirIterator = dir.iterate();
+    while (try dirIterator.next()) |f| {
+        if (std.mem.indexOf(u8, f.name, backup_file_pre_name)) |_| {
+            std.debug.print("Lehendik badago [{s}]-ren babes kopia, ez da berriz eginen.\n", .{file_name});
+            return false;
+        }
+    }
+    const backup_path = std.fmt.allocPrint(std.heap.page_allocator, "{s}{d}", .{ backup_file_pre_name, std.time.timestamp() }) catch "format failed";
+    try dir.copyFile(file_name, dir, backup_path, .{});
+    
+    return true;
+}
